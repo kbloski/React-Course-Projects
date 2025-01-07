@@ -17,6 +17,7 @@ function App() {
       balance: 0
     }
 
+    setShowAddFriend( false);
     setFriends( friends => [...friends, newFriend] );
   }
 
@@ -71,14 +72,17 @@ function Button( { children, onClick}){
 
 function FormAddFriend({ show, addFriend}){
   const [name, setName] = useState('');
-  const [ imgUrl, setImgUrl ] = useState('');
+  const imgDefautlUrl = "https://i.pravatar.cc/48";
+  const [imgUrl, setImgUrl] = useState( imgDefautlUrl);
 
   function handleSubmit( e ){
     e.preventDefault();
 
+    if (!name || !imgUrl) return;
+
     addFriend( name, imgUrl);
     setName('')
-    setImgUrl('')
+    setImgUrl(imgDefautlUrl)
     
   }
 
