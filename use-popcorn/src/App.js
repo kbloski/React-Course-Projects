@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { tempMovieData, tempWatchedData } from "./store";
 
+
 const average = (arr) =>
   arr.reduce( (acc, curVal, index, arr) => acc + curVal / arr.length, 0);
 
@@ -11,12 +12,16 @@ export default function App() {
 
   return (
       <>
-          <TheNavigation>
+          {/* Provide elements */}
+          <TheNavigation element={
+            <>
               <Logo />
               <Search />
               <NumResults movies={movies} />
-          </TheNavigation>
+            </>
+          }></TheNavigation> 
 
+          {/* Provide elements too */}
           <Main>
               <Box>
                   <MoviesList movies={movies} />
@@ -36,6 +41,22 @@ function Main({ children}){
   </main>;
 }
 
+function Box({ children }) {
+    const [isOpen, setIsOpen] = useState(true);
+
+    return (
+        <div className="box">
+            <Button
+                className="btn-toggle"
+                onClick={() => setIsOpen((open) => !open)}
+            >
+                {isOpen ? "–" : "+"}
+            </Button>
+            {isOpen && children}
+        </div>
+    );
+}
+
 function Button({ children, onClick, className }) {
     return (
         <button onClick={onClick} className={className}>
@@ -44,10 +65,10 @@ function Button({ children, onClick, className }) {
     );
 }
 
-function TheNavigation({ children }){
+function TheNavigation({ element }){
   
   return <nav className="nav-bar">
-          { children}
+          { element}
       </nav>;
 }
 
@@ -73,22 +94,6 @@ function Logo(){
       <span role="img">🍿</span>
       <h1>usePopcorn</h1>
   </div>
-}
-
-function Box({ children }) {
-    const [isOpen, setIsOpen] = useState(true);
-
-    return (
-        <div className="box">
-            <Button
-                className="btn-toggle"
-                onClick={() => setIsOpen((open) => !open)}
-            >
-                {isOpen ? "–" : "+"}
-            </Button>
-            {isOpen && children }
-        </div>
-    );
 }
 
 function MoviesList({ movies}){
