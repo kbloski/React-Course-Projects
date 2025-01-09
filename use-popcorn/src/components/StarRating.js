@@ -1,5 +1,15 @@
 import { useState } from "react";
+import PropTypes from 'prop-types'
 import "./StarRating.scss"
+
+StarRating.propTypes = {
+    maxRating: PropTypes.number , 
+    color: PropTypes.string,
+    size: PropTypes.number ,
+    className: PropTypes.string,
+    messages: PropTypes.array,
+    onSetRating: PropTypes.func
+}
 
 export default function StarRating(
     { 
@@ -7,7 +17,8 @@ export default function StarRating(
         color = "#FCC419",
         size = 30,
         className='',
-        messages=[]
+        messages=[],
+        onSetRating
     }
 ){
 
@@ -16,6 +27,8 @@ export default function StarRating(
 
     function handleRating( num ){
         setRaiting( num )
+
+        if (onSetRating) onSetRating( val => num)
     }
 
     return (
