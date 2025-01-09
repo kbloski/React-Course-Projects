@@ -1,38 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { tempMovieData, tempWatchedData } from "./store";
 
+const API_KEY = 'c38fbbc8';
 
 const average = (arr) =>
   arr.reduce( (acc, curVal, index, arr) => acc + curVal / arr.length, 0);
 
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+    const [movies, setMovies] = useState([]);
+    const [watched, setWatched] = useState([]);
 
 
-  return (
-      <>
-          {/* Provide elements */}
-          <TheNavigation element={
-            <>
-              <Logo />
-              <Search />
-              <NumResults movies={movies} />
-            </>
-          }></TheNavigation> 
+    useEffect( () => {
+        fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=Interstellar`)
+        .then( res => res.json())
+        .then( data => setMovies( data.Search)) 
+    }, [])
 
-          {/* Provide elements too */}
-          <Main>
-              <Box>
-                  <MoviesList movies={movies} />
-              </Box>
-              <Box>
-                  <SummaryHeader watched={watched} />
-                  <WatchedMovieList watched={watched} />
-              </Box>
-          </Main>
-      </>
-  );
+    return (
+        <>
+            {/* Provide elements */}
+            <TheNavigation
+                element={
+                    <>
+                        <Logo />
+                        <Search />
+                        <NumResults movies={movies} />
+                    </>
+                }
+            ></TheNavigation>
+
+            {/* Provide elements too */}
+            <Main>
+                <Box>
+                    <MoviesList movies={movies} />
+                </Box>
+                <Box>
+                    <SummaryHeader watched={watched} />
+                    <WatchedMovieList watched={watched} />
+                </Box>
+            </Main>
+        </>
+    );
 }
 
 function Main({ children}){

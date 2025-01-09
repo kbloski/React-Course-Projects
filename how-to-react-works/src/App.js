@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { content } from "./store";
 
+
 export default function App() {
   return (
     <div>
@@ -48,28 +49,45 @@ function TabContent({ item }) {
   function handleInc() {
     setLikes(likes + 1);
   }
-  return ( 
-    <div className="tab-content">
-      <h4>{item.summary}</h4>
-      {showDetails && <p>{item.details}</p>}
 
-      <div className="tab-actions">
-        <button onClick={() => setShowDetails((h) => !h)}>
-          {showDetails ? "Hide" : "Show"} details
-        </button>
+  function handleTripleInc() {
+    setLikes(l => l + 1);
+    setLikes(l => l + 1);
+    setLikes(l => l + 1);
+  }
 
-        <div className="hearts-counter">
-          <span>{likes} ❤️</span>
-          <button onClick={handleInc}>+</button>
-          <button>+++</button>
-        </div>
+  function handleUndo(){
+    setShowDetails( true )
+    setLikes(0)
+  }
+
+  function handleUndoin2s(){
+    // console.log('test')
+    setTimeout( () => handleUndo(), 2000)
+  }
+
+  return (
+      <div className="tab-content">
+          <h4>{item.summary}</h4>
+          {showDetails && <p>{item.details}</p>}
+
+          <div className="tab-actions">
+              <button onClick={() => setShowDetails((h) => !h)}>
+                  {showDetails ? "Hide" : "Show"} details
+              </button>
+
+              <div className="hearts-counter">
+                  <span>{likes} ❤️</span>
+                  <button onClick={handleInc}>+</button>
+                  <button onClick={handleTripleInc}>+++</button>
+              </div>
+          </div>
+
+          <div className="tab-undo">
+              <button onClick={handleUndo}>Undo</button>
+              <button onClick={handleUndoin2s}>Undo in 2s</button>
+          </div>
       </div>
-
-      <div className="tab-undo">
-        <button>Undo</button>
-        <button>Undo in 2s</button>
-      </div>
-    </div>
   );
 }
 
