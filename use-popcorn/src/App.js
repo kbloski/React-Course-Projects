@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { tempMovieData, tempWatchedData } from "./store";
 
-const API_KEY = 'c38fbbc8';
 
 const average = (arr) =>
   arr.reduce( (acc, curVal, index, arr) => acc + curVal / arr.length, 0);
@@ -12,9 +11,13 @@ export default function App() {
 
 
     useEffect( () => {
+        const API_KEY = process.env.REACT_APP_API_KEY;
+
         fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=Interstellar`)
         .then( res => res.json())
-        .then( data => setMovies( data.Search)) 
+        .then( data => setMovies( data?.Search ?? [])) 
+
+
     }, [])
 
     return (
