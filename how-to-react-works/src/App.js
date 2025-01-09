@@ -26,7 +26,7 @@ function Tabbed({ content }) {
       ) : (
         <DifferentContent />
       )}
-    </div>
+    </div> 
   );
 }
 
