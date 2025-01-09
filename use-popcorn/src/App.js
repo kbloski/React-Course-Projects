@@ -10,6 +10,7 @@ export default function App() {
     const [watched, setWatched] = useState([]);
     const [query, setQuery] = useState("Interstellar");
     const [ isLoading, setIsLoading] = useState( false )
+    const [ error, setError] = useState( null )
 
 
     useEffect( () => {
@@ -17,24 +18,30 @@ export default function App() {
 
         async function fetchMovies() {
 
-            setIsLoading( true )
+            try {
 
-            const response = await fetch(
-                `https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
-            );
-
-            const data = await response.json();
-
-            setMovies( data?.Search ?? [])
-            setIsLoading( false)
+                setIsLoading( true )
+    
+                const response = await fetch(
+                    `https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
+                );
+    
+                if (!response.ok) throw new Error("Something went wrong with fetching movies. ")
+    
+                const data = await response.json();
+    
+                setMovies( data?.Search ?? [])
+                
+            } catch (err){
+                console.error( err.message )
+                setError( err.message )
+            } finally {
+                setIsLoading( false)
+            }
         }
 
         fetchMovies();
-
-        
-
-
-    }, [])
+    }, [ query ])
 
     return (
         <>
@@ -43,7 +50,7 @@ export default function App() {
                 element={
                     <>
                         <Logo />
-                        <Search />
+                        <Search onSetValue={setQuery}/>
                         <NumResults movies={movies} />
                     </>
                 }
@@ -52,10 +59,9 @@ export default function App() {
             {/* Provide elements too */}
             <Main>
                 <Box>
-                    { isLoading 
-                    ? <Loader />
-                    : <MoviesList movies={movies} />
-                    }
+                    { isLoading && !error && <Loader /> }
+                    { !isLoading && !error && <MoviesList movies={movies} />}
+                    { !isLoading && error && <ErrorMessage message={error} />}
                 </Box>
                 <Box>
                     <SummaryHeader watched={watched} />
@@ -70,6 +76,12 @@ function Main({ children}){
   return <main className="main">
       {children}
   </main>;
+}
+
+function ErrorMessage( {message} ){
+    return <p className="error">
+        <span> 🛑 </span> { message}
+    </p>
 }
 
 function Loader(){
@@ -107,15 +119,27 @@ function TheNavigation({ element }){
       </nav>;
 }
 
-function Search(){
+function Search({ onSetValue }){
   const [query, setQuery] = useState("");
-  return <input
-        className="search"
-        type="text"
-        placeholder="Search movies..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-    />
+
+  function onSearch(){
+    console.log( 'test')
+    onSetValue( query )
+  }
+
+  return (
+      <>
+          <input
+              className="search"
+              type="text"
+              placeholder="Search movies..."
+              value={query}
+              onBlur={onSearch}
+              onChange={(e) => setQuery(e.target.value)}
+          />
+      </>
+  );
+
 }
 
 function NumResults({ movies }){
