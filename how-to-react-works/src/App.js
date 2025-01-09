@@ -49,7 +49,7 @@ function TabContent({ item }) {
     setLikes(likes + 1);
   }
 
-  return (
+  return ( 
     <div className="tab-content">
       <h4>{item.summary}</h4>
       {showDetails && <p>{item.details}</p>}
