@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { tempMovieData, tempWatchedData } from "./store";
-
 
 const average = (arr) =>
   arr.reduce( (acc, curVal, index, arr) => acc + curVal / arr.length, 0);
@@ -8,10 +6,14 @@ const average = (arr) =>
 export default function App() {
     const [movies, setMovies] = useState([]);
     const [watched, setWatched] = useState([]);
-    const [query, setQuery] = useState("Interstellar");
+    const [query, setQuery] = useState( 'interstellar');
     const [ isLoading, setIsLoading] = useState( false )
     const [ error, setError] = useState( null )
+    const [selectedId, setSelectedId] = useState(null);
 
+    function handleSelectMovie( id ){
+        setSelectedId( id )
+    }
 
     useEffect( () => {
         const API_KEY = process.env.REACT_APP_API_KEY;
@@ -31,6 +33,8 @@ export default function App() {
                 const data = await response.json();
     
                 setMovies( data?.Search ?? [])
+
+                console.log( data?.Search)
                 
             } catch (err){
                 console.error( err.message )
@@ -39,7 +43,7 @@ export default function App() {
                 setIsLoading( false)
             }
         }
-
+        if (!query) return;
         fetchMovies();
     }, [ query ])
 
@@ -60,12 +64,17 @@ export default function App() {
             <Main>
                 <Box>
                     { isLoading && !error && <Loader /> }
-                    { !isLoading && !error && <MoviesList movies={movies} />}
+                    { !isLoading && !error && <MoviesList movies={movies} onSelectMovie={handleSelectMovie} />}
                     { !isLoading && error && <ErrorMessage message={error} />}
                 </Box>
                 <Box>
-                    <SummaryHeader watched={watched} />
-                    <WatchedMovieList watched={watched} />
+                    { !selectedId && <>
+                        <SummaryHeader watched={watched} />
+                        <WatchedMovieList watched={watched} />
+                    </>}
+                    { !!selectedId && <>
+                        <SelectedMovie selectedId={selectedId} />
+                    </>}
                 </Box>
             </Main>
         </>
@@ -155,14 +164,14 @@ function Logo(){
   </div>
 }
 
-function MoviesList({ movies}){
+function MoviesList({ movies, onSelectMovie}){
   return <ul className="list">
-    {movies?.map((movie) => <Movie key={movie.imdbID} movie={movie} />)}
+    {movies?.map((movie) => <Movie key={movie.imdbID} movie={movie} onSelectMovie={onSelectMovie} />)}
   </ul>
 }
 
-function Movie({ movie}){
-  return <li key={movie.imdbID}>
+function Movie({ movie, onSelectMovie}){
+  return <li key={movie.imdbID} onClick={ () => onSelectMovie( movie.imdbID)}>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
       <h3>{movie.Title}</h3>
       <div>
@@ -235,4 +244,31 @@ function SummaryHeader({ watched}){
               </p>
           </div>
       </div>
+}
+
+function SelectedMovie({ selectedId }){
+    const [movieData, setMovieData] = useState(null);
+    const [ isLoading, setIsLoading] = useState( false )
+
+    useEffect(() => {
+        const API_KEY = process.env.REACT_APP_API_KEY;
+
+        async function getMovieData(){
+            setIsLoading( true )
+            const res = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${selectedId}`)
+            
+            if (!res.ok) throw new Error("Error with get movie.")
+            const data = await res.json()
+
+            setMovieData( data )
+            setIsLoading( false)
+        }
+
+        getMovieData()
+    }, [selectedId])
+
+    return <div className="detail">
+        { !!isLoading && <Loader />}
+        { !isLoading && JSON.stringify( movieData)}
+    </div>
 }
