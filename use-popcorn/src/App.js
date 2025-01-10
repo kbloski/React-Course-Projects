@@ -7,7 +7,7 @@ const average = (arr) =>
 export default function App() {
     const [movies, setMovies] = useState([]);
     const [watched, setWatched] = useState([]);
-    const [query, setQuery] = useState("interstellar");
+    const [query, setQuery] = useState();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedId, setSelectedId] = useState(null);
@@ -46,13 +46,15 @@ export default function App() {
 
     useEffect(() => {
         const API_KEY = process.env.REACT_APP_API_KEY;
+        const controller = new AbortController()
 
         async function fetchMovies() {
             try {
                 setIsLoading(true);
 
                 const response = await fetch(
-                    `https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
+                    `https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`,
+                    { signal: controller.signal }
                 );
 
                 if (!response.ok)
@@ -63,7 +65,9 @@ export default function App() {
                 const data = await response.json();
 
                 setMovies(data?.Search ?? []);
+                setError('')
             } catch (err) {
+                if (err.name === 'AbortError') return;
                 setError(err.message);
             } finally {
                 setIsLoading(false);
@@ -71,6 +75,10 @@ export default function App() {
         }
         if (!query) return;
         fetchMovies();
+
+        return () => {
+            controller.abort()
+        }
     }, [query]);
 
     return (
@@ -168,8 +176,9 @@ function TheNavigation({ element }) {
 function Search({ onSetValue }) {
     const [query, setQuery] = useState("");
 
-    function onSearch() {
-        onSetValue(query);
+    function onSearch( value ) {
+        setQuery( value )
+        onSetValue( value );
     }
 
     return (
@@ -179,8 +188,9 @@ function Search({ onSetValue }) {
                 type="text"
                 placeholder="Search movies..."
                 value={query}
-                onBlur={onSearch}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={e => onSearch( e.target.value )}
+                // onBlur={onSearch}
+                // onChange={(e) => setQuery(e.target.value)}
             />
         </>
     );
