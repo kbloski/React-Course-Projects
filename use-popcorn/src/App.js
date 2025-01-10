@@ -40,9 +40,9 @@ export default function App() {
         );
     }
 
-    useEffect( () => {
-        if (!selectedId) document.title = 'UsePopcorn'
-    }, [selectedId])
+    // useEffect( () => {
+    //     if (!selectedId) document.title = 'UsePopcorn'
+    // }, [selectedId])
 
     useEffect(() => {
         const API_KEY = process.env.REACT_APP_API_KEY;
@@ -345,7 +345,12 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     }
 
     useEffect( () => {
+        const oldTitle = document.title;
         if (title) document.title = title;
+
+        return () => {
+            document.title = oldTitle
+        }
     }, [ title])
 
     useEffect(() => {
