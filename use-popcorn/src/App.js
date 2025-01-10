@@ -40,9 +40,13 @@ export default function App() {
         );
     }
 
-    // useEffect( () => {
-    //     if (!selectedId) document.title = 'UsePopcorn'
-    // }, [selectedId])
+    useEffect( () => {
+        document.addEventListener('keydown', event => {
+            if ( event.code === 'Escape') {
+                handleClearSelectId()
+            }
+        })
+    }, [])
 
     useEffect(() => {
         const API_KEY = process.env.REACT_APP_API_KEY;
