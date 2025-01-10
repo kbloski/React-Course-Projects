@@ -21,7 +21,18 @@ export default function App() {
     }
 
     function handleAddWatched( movie ){
-        setWatched( watched => [...watched, movie])
+        const existMovie = watched.find( (watched) => watched.imbdId == movie.imbdId);
+
+        
+        if (!existMovie) return setWatched( watched => [...watched, movie])
+        
+        setWatched( 
+            watched => watched.map(
+                (w) => {
+                    if (w.imbdId !== existMovie.imbdId) return w;
+                    return {...w, ...movie};
+        }))
+
     }
 
     useEffect( () => {
