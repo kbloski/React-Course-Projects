@@ -11,7 +11,6 @@ export default function App() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedId, setSelectedId] = useState(null);
-
     function handleSelectMovie(id) {
         setSelectedId(id);
     }
@@ -36,12 +35,14 @@ export default function App() {
     }
 
     function handleDeleteWatched( imbdId ){
-        // console.log( watched)
-        console.log( imbdId)
         setWatched( watched =>
             watched.filter((movie) => movie.imbdId !== imbdId)
         );
     }
+
+    useEffect( () => {
+        if (!selectedId) document.title = 'UsePopcorn'
+    }, [selectedId])
 
     useEffect(() => {
         const API_KEY = process.env.REACT_APP_API_KEY;
@@ -355,9 +356,12 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
             if (!res.ok) throw new Error("Error with get movie.");
             const data = await res.json();
 
+            if (data?.Title) document.title = data?.Title;
+
             setMovie(data);
             setIsLoading(false);
         }
+
 
         getMovieData();
     }, [selectedId]);
