@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import StarRating from "./components/StarRating";
 
 const average = (arr) =>
@@ -24,28 +24,32 @@ export default function App() {
             (watched) => watched.imbdId == movie.imbdId
         );
 
-        if (!existMovie) return setWatched((watched) => [...watched, movie]);
+        if (!existMovie) setWatched((watched) => [...watched, movie]);
+        else {
+            setWatched((watched) =>
+                watched.map((w) => {
+                    if (w.imbdId !== existMovie.imbdId) return w;
+                    return { ...w, ...movie };
+                })
+            );
+        }
 
-        setWatched((watched) =>
-            watched.map((w) => {
-                if (w.imbdId !== existMovie.imbdId) return w;
-                return { ...w, ...movie };
-            })
-        );
+        localStorage.setItem('watched', JSON.stringify( [...watched, movie]))
     }
-
+    
     function handleDeleteWatched( imbdId ){
-        setWatched( watched =>
-            watched.filter((movie) => movie.imbdId !== imbdId)
-        );
+        const newWatched = watched.filter((movie) => movie.imbdId !== imbdId)
+
+        setWatched( newWatched);
+        localStorage.setItem('watched', JSON.stringify( newWatched))
     }
 
     useEffect( () => {
-        document.addEventListener('keydown', event => {
-            if ( event.code === 'Escape') {
-                handleClearSelectId()
-            }
-        })
+        const items = localStorage.getItem('watched')
+        if (!items) return;
+
+
+        setWatched( JSON.parse(items) )
     }, [])
 
     useEffect(() => {
@@ -179,11 +183,22 @@ function TheNavigation({ element }) {
 
 function Search({ onSetValue }) {
     const [query, setQuery] = useState("");
+    const inputEl = useRef( null)
+
 
     function onSearch( value ) {
         setQuery( value )
         onSetValue( value );
     }
+
+    useEffect( () => { 
+        document.addEventListener( 'keypress', e => {
+            console.log( e.code)
+            if (e.code === "Enter") inputEl.current.focus();
+        })
+        inputEl.current.focus()
+    }, [])
+
 
     return (
         <>
@@ -195,6 +210,7 @@ function Search({ onSetValue }) {
                 onChange={e => onSearch( e.target.value )}
                 // onBlur={onSearch}
                 // onChange={(e) => setQuery(e.target.value)}
+                ref={inputEl}
             />
         </>
     );
@@ -386,6 +402,12 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
         getMovieData();
     }, [selectedId]);
+
+    useEffect( () => { 
+        document.addEventListener('keydown', e => {
+            if (e.code === 'Escape') handleCloseMovie()
+        })
+    })
 
     return (
         <div className="details">
