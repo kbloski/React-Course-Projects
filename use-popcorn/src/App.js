@@ -344,6 +344,10 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
         onCloseMovie();
     }
 
+    useEffect( () => {
+        if (title) document.title = title;
+    }, [ title])
+
     useEffect(() => {
         const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -355,8 +359,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
             if (!res.ok) throw new Error("Error with get movie.");
             const data = await res.json();
-
-            if (data?.Title) document.title = data?.Title;
 
             setMovie(data);
             setIsLoading(false);
