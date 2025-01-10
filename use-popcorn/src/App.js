@@ -35,6 +35,14 @@ export default function App() {
         );
     }
 
+    function handleDeleteWatched( imbdId ){
+        // console.log( watched)
+        console.log( imbdId)
+        setWatched( watched =>
+            watched.filter((movie) => movie.imbdId !== imbdId)
+        );
+    }
+
     useEffect(() => {
         const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -55,7 +63,6 @@ export default function App() {
 
                 setMovies(data?.Search ?? []);
             } catch (err) {
-                console.error(err.message);
                 setError(err.message);
             } finally {
                 setIsLoading(false);
@@ -94,7 +101,7 @@ export default function App() {
                     {!selectedId && (
                         <>
                             <SummaryHeader watched={watched} />
-                            <WatchedMovieList watched={watched} />
+                            <WatchedMovieList watched={watched} onDeleteWatched={handleDeleteWatched}/>
                         </>
                     )}
                     {!!selectedId && (
@@ -224,17 +231,21 @@ function Movie({ movie, onSelectMovie }) {
     );
 }
 
-function WatchedMovieList({ watched }) {
+function WatchedMovieList({ watched, onDeleteWatched }) {
     return (
         <ul className="list">
             {watched.map((movie) => (
-                <WatchedMovie key={movie.imdbID} movie={movie} />
+                <WatchedMovie key={movie.imdbID} movie={movie} onDeleteWatched={onDeleteWatched} />
             ))}
         </ul>
     );
 }
 
-function WatchedMovie({ movie }) {
+function WatchedMovie({ movie, onDeleteWatched }) {
+    function handleDeleteWatched(){
+        onDeleteWatched(movie.imbdId);
+    }
+
     return (
         <li key={movie.imdbID}>
             <img src={movie.poster} alt={`${movie.title} poster`} />
@@ -252,6 +263,11 @@ function WatchedMovie({ movie }) {
                     <span>⏳</span>
                     <span>{movie.runtime} min</span>
                 </p>
+
+                <button
+                    className="btn-delete"
+                    onClick={handleDeleteWatched}
+                ></button>
             </div>
         </li>
     );
@@ -388,7 +404,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
                                         </button>
                                     )}
                                 </>
-                            ): <p>You raited with movie { existWatched.userRating} ⭐</p>}
+                            ): <p>You raited with movie { existWatched?.userRating} ⭐</p>}
                         </div>
                         <p>
                             <em> {plot}</em>
