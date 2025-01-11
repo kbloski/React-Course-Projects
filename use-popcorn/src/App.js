@@ -1,14 +1,16 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import StarRating from "./components/StarRating";
 import { useMovies } from "./hooks/useMovies";
+import { useLocalStorageState } from "./hooks/useLocalStorageState";
 
 const average = (arr) =>
     arr.reduce((acc, curVal, index, arr) => acc + curVal / arr.length, 0);
 
 export default function App() {
-    const [watched, setWatched] = useState([]);
     const [query, setQuery] = useState('');
-    const [movies, isLoading, error] = useMovies(query, handleClearSelectId )
+    const [movies, isLoading, error] = useMovies(query)
+    const { watched, setWatched, addWatched } = useLocalStorageState()
+
     const [selectedId, setSelectedId] = useState(null);
     function handleSelectMovie(id) {
         setSelectedId(id);
@@ -19,34 +21,19 @@ export default function App() {
     }
 
     function handleAddWatched(movie) {
-        const existMovie = watched.find(
-            (watched) => watched.imbdId == movie.imbdId
-        );
-
-        if (!existMovie) setWatched((watched) => [...watched, movie]);
-        else {
-            setWatched((watched) =>
-                watched.map((w) => {
-                    if (w.imbdId !== existMovie.imbdId) return w;
-                    return { ...w, ...movie };
-                })
-            );
-        }
-
-        localStorage.setItem('watched', JSON.stringify( [...watched, movie]))
+        addWatched( movie )
     }
     
     function handleDeleteWatched( imbdId ){
         const newWatched = watched.filter((movie) => movie.imbdId !== imbdId)
-        setWatched( newWatched);
+        setWatched( newWatched );
         localStorage.setItem('watched', JSON.stringify( newWatched))
     }
 
     useEffect( () => {
-        const items = localStorage.getItem('watched')
-        if (!items) return;
-        setWatched( JSON.parse(items) )
-    }, [])
+        handleClearSelectId()
+        console.log('test')
+    }, [isLoading])
 
     return (
         <>
