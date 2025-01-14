@@ -5,5 +5,5 @@ export default function NextButton({dispatch, answer}){
         dispatch({ type: "nextQuestion" });
     }
 
-    return <button className="btn btn-ui" onClick={handleClick}>NextButton</button>
+    return <button className="btn btn-ui" onClick={handleClick}>Next</button>
 }

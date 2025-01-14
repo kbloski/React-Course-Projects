@@ -7,6 +7,7 @@ import Main from "./components/Main";
 import StartScreen from "./components/StartScreen";
 import Question from "./components/Question"; 
 import NextButton from "./components/NextButton";
+import Progress from "./components/Progress";
 
 const initialState = {
   status: 'loading',
@@ -57,8 +58,9 @@ function reducer(state, action){
 }
 
 function App() {
-  const [{status, questions, questionIndex, answer}, dispatch] = useReducer( reducer, initialState)
+  const [{status, questions, questionIndex, answer, points}, dispatch] = useReducer( reducer, initialState)
   const { questions : dataQuestions , isLoading, error } = useQuestions()
+  const maxPossiblePoints = !!questions.length ? questions.reduce( (acc, question) => acc += question.points, 0) : 0
   const numQuestions = questions.length;
 
 
@@ -80,7 +82,9 @@ function App() {
               { status === 'error' && <Error />}
               { status === 'ready' && <StartScreen numQuestions={numQuestions} onStart={() => dispatch({ type: 'startQuiz'}) }/>}
               { status === 'active' && <>
+                <Progress index={questionIndex} numQuestions={numQuestions} points={points} maxPossiblePoints={maxPossiblePoints} answer={answer}/>
                 <Question 
+                
                   question={questions[questionIndex]} 
                   answer={answer}
                   dispatch={dispatch}
