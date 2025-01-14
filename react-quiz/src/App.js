@@ -10,7 +10,8 @@ import Question from "./components/Question";
 const initialState = {
   status: 'loading',
   questions: [],
-  questionIndex: 0
+  questionIndex: 0,
+  answer: null
 }
 
 function reducer(state, action){
@@ -31,6 +32,11 @@ function reducer(state, action){
         ...state,
         status: 'active' 
       }
+    case 'newAnswer':
+      return {
+        ...state,
+        answer: action.payload
+      }
     default: 
       throw new Error("Unknown action")
   }
@@ -38,7 +44,7 @@ function reducer(state, action){
 }
 
 function App() {
-  const [{status, questions, questionIndex}, dispatch] = useReducer( reducer, initialState)
+  const [{status, questions, questionIndex, answer}, dispatch] = useReducer( reducer, initialState)
   const { questions : dataQuestions , isLoading, error } = useQuestions()
   const numQuestions = questions.length;
 
@@ -59,7 +65,11 @@ function App() {
               { status === 'loading' && <Loader />}
               { status === 'error' && <Error />}
               { status === 'ready' && <StartScreen numQuestions={numQuestions} onStart={() => dispatch({ type: 'startQuiz'}) }/>}
-              { status === 'active' && <Question question={questions[questionIndex]} />}
+              { status === 'active' && <Question 
+                question={questions[questionIndex]} 
+                answer={answer}
+                dispatch={dispatch}
+              />}
           </Main>
       </div>
   );
