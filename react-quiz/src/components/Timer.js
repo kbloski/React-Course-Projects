@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 export default function Timer({ dispatch, maxTime }) {
     const [time, setTime] = useState(maxTime)
+    const minuts = Math.floor( time / 60)
+    const seconds = time % 60
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -16,5 +18,7 @@ export default function Timer({ dispatch, maxTime }) {
         };
     }, []);
 
-    return <div className="timer">🕛{time} sec</div>;
+    return <div className="timer">
+        {String(minuts).padStart(2, '0')} : {String(seconds).padStart(2,'0')}
+    </div>;
 }
