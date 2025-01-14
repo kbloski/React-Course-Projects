@@ -5,10 +5,11 @@ import Loader from './components/Loader'
 import Error from './components/Error'
 import Main from "./components/Main";
 import StartScreen from "./components/StartScreen";
+import Question from "./components/Question"; 
 
 const initialState = {
   status: 'loading',
-  questions: null
+  questions: []
 }
 
 function reducer(state, action){
@@ -25,7 +26,10 @@ function reducer(state, action){
         status: 'error'
       }
     case 'startQuiz':
-      return { started: true, questions: []}
+      return {
+        ...state,
+        status: 'active' 
+      }
     default: 
       throw new Error("Unknown action")
   }
@@ -35,6 +39,9 @@ function reducer(state, action){
 function App() {
   const [{status, questions}, dispatch] = useReducer( reducer, initialState)
   const { questions : dataQuestions , isLoading, error } = useQuestions()
+
+
+  const numQuestions = questions.length;
 
   useEffect(() => {
     if (error){
@@ -52,7 +59,8 @@ function App() {
           <Main>
               { status === 'loading' && <Loader />}
               { status === 'error' && <Error />}
-              { status === 'ready' && <StartScreen />}
+              { status === 'ready' && <StartScreen numQuestions={numQuestions} onStart={() => dispatch({ type: 'startQuiz'}) }/>}
+              { status === 'active' && <Question />}
           </Main>
       </div>
   );
