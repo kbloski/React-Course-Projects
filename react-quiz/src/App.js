@@ -1,6 +1,7 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer } from "react";
 import { useQuestions } from "./hooks/useQuestions";
 import Header from "./components/Header";
+import Footer from './components/Footer.js'
 import Loader from './components/Loader'
 import Error from './components/Error'
 import Main from "./components/Main";
@@ -9,6 +10,8 @@ import Question from "./components/Question";
 import NextButton from "./components/NextButton";
 import Progress from "./components/Progress";
 import FinishScreen from "./components/FinishScreen";
+import Timer from "./components/Timer.js";
+
 
 const initialState = {
   status: 'loading',
@@ -16,7 +19,8 @@ const initialState = {
   questionIndex: 0,
   answer: null,
   points: 0,
-  highscore: 0
+  highscore: 0,
+  maxQuizTime: 100
 }
 
 function reducer(state, action){
@@ -74,10 +78,12 @@ function reducer(state, action){
 }
 
 function App() {
-  const [{status, questions, questionIndex, answer, points, highscore}, dispatch] = useReducer( reducer, initialState)
+  const [{status, questions, questionIndex, answer, points, highscore, maxQuizTime}, dispatch] = useReducer( reducer, initialState)
   const { questions : dataQuestions , isLoading, error } = useQuestions()
   const maxPossiblePoints = !!questions.length ? questions.reduce( (acc, question) => acc += question.points, 0) : 0
   const numQuestions = questions.length;
+
+  console.log('test')
 
 
   useEffect(() => {
@@ -94,21 +100,50 @@ function App() {
       <div className="app">
           <Header />
           <Main>
-              { status === 'loading' && <Loader />}
-              { status === 'error' && <Error />}
-              { status === 'ready' && <StartScreen numQuestions={numQuestions} onStart={() => dispatch({ type: 'startQuiz'}) }/>}
-              { status === 'active' && <>
-                <Progress index={questionIndex} numQuestions={numQuestions} points={points} maxPossiblePoints={maxPossiblePoints} answer={answer}/>
-                <Question 
-                
-                  question={questions[questionIndex]} 
-                  answer={answer}
-                  dispatch={dispatch}
-                />
-                <NextButton dispatch={dispatch} answer={answer} index={questionIndex} numQuestions={numQuestions} />
-              </> 
-              }
-              { status === 'finished' && <FinishScreen points={points} maxPossiblePoints={maxPossiblePoints} highscore={highscore} dispatch={dispatch}/> }
+              {status === "loading" && <Loader />}
+              {status === "error" && <Error />}
+              {status === "ready" && (
+                  <StartScreen
+                      numQuestions={numQuestions}
+                      onStart={() => dispatch({ type: "startQuiz" })}
+                  />
+              )}
+              {status === "active" && (
+                  <>
+                      <Progress
+                          index={questionIndex}
+                          numQuestions={numQuestions}
+                          points={points}
+                          maxPossiblePoints={maxPossiblePoints}
+                          answer={answer}
+                      />
+                      <Question
+                          question={questions[questionIndex]}
+                          answer={answer}
+                          dispatch={dispatch}
+                      />
+                      <Footer>
+                          <Timer
+                              dispatch={dispatch}
+                              maxTime={maxQuizTime}
+                          />
+                          <NextButton
+                              dispatch={dispatch}
+                              answer={answer}
+                              index={questionIndex}
+                              numQuestions={numQuestions}
+                          />
+                      </Footer>
+                  </>
+              )}
+              {status === "finished" && (
+                  <FinishScreen
+                      points={points}
+                      maxPossiblePoints={maxPossiblePoints}
+                      highscore={highscore}
+                      dispatch={dispatch}
+                  />
+              )}
           </Main>
       </div>
   );
