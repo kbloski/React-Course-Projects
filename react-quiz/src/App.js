@@ -20,7 +20,7 @@ const initialState = {
   answer: null,
   points: 0,
   highscore: 0,
-  maxQuizTime: 100
+  maxQuizTime: 300
 }
 
 function reducer(state, action){
@@ -82,8 +82,6 @@ function App() {
   const { questions : dataQuestions , isLoading, error } = useQuestions()
   const maxPossiblePoints = !!questions.length ? questions.reduce( (acc, question) => acc += question.points, 0) : 0
   const numQuestions = questions.length;
-
-  console.log('test')
 
 
   useEffect(() => {

@@ -7,7 +7,9 @@ export default function Timer({ dispatch, maxTime }) {
 
     useEffect(() => {
         const intervalId = setInterval(() => {
-            if (time <= 0) dispatch({ type: "finish" });
+            if (time <= 0){
+                dispatch({ type: "finish" });
+            } 
             else setTime( t => t - 1);
             
             // dispatch({ type: "finish" });
@@ -16,7 +18,7 @@ export default function Timer({ dispatch, maxTime }) {
         return () => {
             clearInterval(intervalId);
         };
-    }, []);
+    }, [ time ]);
 
     return <div className="timer">
         {String(minuts).padStart(2, '0')} : {String(seconds).padStart(2,'0')}
