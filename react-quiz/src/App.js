@@ -1,21 +1,29 @@
 import { useEffect, useReducer, useState } from "react";
+import { useQuestions } from "./hooks/useQuestions";
 import Header from "./components/Header";
 import Loader from './components/Loader'
-// import data from './store/questions.json'
-
+import Error from './components/Error'
 import Main from "./components/Main";
-import { useQuestions } from "./hooks/useQuestions";
-// import DateCounter from "./components/DateCounter";
+import StartScreen from "./components/StartScreen";
 
 const initialState = {
-  started: false,
+  status: 'loading',
   questions: null
 }
 
 function reducer(state, action){
   switch( action.type ){
-    case 'setQuestions':
-      return { ...state, questions: action.payload}
+    case 'dataReceived':
+      return { 
+        ...state, 
+        questions: action.payload,
+        status: 'ready'
+      }
+    case 'dataFailed':
+      return {
+        ...state,
+        status: 'error'
+      }
     case 'startQuiz':
       return { started: true, questions: []}
     default: 
@@ -25,26 +33,26 @@ function reducer(state, action){
 }
 
 function App() {
-  const [state, dispatch] = useReducer( reducer, initialState)
-  const { questions , isLoading, error } = useQuestions()
+  const [{status, questions}, dispatch] = useReducer( reducer, initialState)
+  const { questions : dataQuestions , isLoading, error } = useQuestions()
 
-  useEffect( () => {
-    // console.log( questions)
-    if (!questions) return;
-    dispatch({type: 'setQuestions', payload: questions})
-  }, [questions])
+  useEffect(() => {
+    if (error){
+      return dispatch({ type: "dataFailed" });
+    } 
+    else if (dataQuestions){
+      return dispatch({ type: "dataReceived", payload: dataQuestions });
+    }
+  }, [dataQuestions, error]);
   
 
   return (
       <div className="app">
           <Header />
           <Main>
-              { !!isLoading && <Loader />}
-              { !isLoading && <>
-                <p>1/15</p>
-                <p>Questions?</p>
-                { JSON.stringify( state.questions ) }
-              </>}
+              { status === 'loading' && <Loader />}
+              { status === 'error' && <Error />}
+              { status === 'ready' && <StartScreen />}
           </Main>
       </div>
   );

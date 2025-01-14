@@ -19,7 +19,6 @@ export function useQuestions( ){
             console.error(err);
         })
         .finally( () => setIsLoading(false));
-
     }, [])
 
     return {
