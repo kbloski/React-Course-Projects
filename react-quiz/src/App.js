@@ -6,6 +6,7 @@ import Error from './components/Error'
 import Main from "./components/Main";
 import StartScreen from "./components/StartScreen";
 import Question from "./components/Question"; 
+import NextButton from "./components/NextButton";
 
 const initialState = {
   status: 'loading',
@@ -34,16 +35,21 @@ function reducer(state, action){
         status: 'active' 
       }
     case 'newAnswer':
-
       const question = state.questions[ state.questionIndex]
 
       return {
           ...state,
           answer: action.payload,
           points: action.payload === question.correctOption
-                  ? (state.points += question.points)
+                  ? (state.points = state.points +  question.points)
                   : state.points,
       };
+    case 'nextQuestion':
+      return {
+        ...state,
+        answer: null,
+        questionIndex: ++state.questionIndex
+      }
     default: 
       throw new Error("Unknown action")
   }
@@ -54,6 +60,7 @@ function App() {
   const [{status, questions, questionIndex, answer}, dispatch] = useReducer( reducer, initialState)
   const { questions : dataQuestions , isLoading, error } = useQuestions()
   const numQuestions = questions.length;
+
 
   useEffect(() => {
     if (error){
@@ -72,11 +79,15 @@ function App() {
               { status === 'loading' && <Loader />}
               { status === 'error' && <Error />}
               { status === 'ready' && <StartScreen numQuestions={numQuestions} onStart={() => dispatch({ type: 'startQuiz'}) }/>}
-              { status === 'active' && <Question 
-                question={questions[questionIndex]} 
-                answer={answer}
-                dispatch={dispatch}
-              />}
+              { status === 'active' && <>
+                <Question 
+                  question={questions[questionIndex]} 
+                  answer={answer}
+                  dispatch={dispatch}
+                />
+                <NextButton dispatch={dispatch} answer={answer} />
+              </> 
+              }
           </Main>
       </div>
   );

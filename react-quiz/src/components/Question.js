@@ -14,6 +14,7 @@ export default function Question({
             <div className="questions">
                 {question.options.map((option, index) => (
                     <Option
+                        key={index}
                         option={option}
                         className={`${index === answer && 'answer'} ${
                             hasAnswered ? (index === question.correctOption ? 'correct' : 'wrong') : ''}`}
@@ -22,12 +23,11 @@ export default function Question({
                     />
                 ))}
             </div>
-            {JSON.stringify(question)}
         </div>
     );
 }
 
-function Option({option, onClick, disabled, className}){
+function Option({option, onClick, className, disabled}){
     return <button 
         className={`btn btn-option ${className}`}
         disabled={disabled}
