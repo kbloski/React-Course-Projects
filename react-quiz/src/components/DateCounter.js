@@ -1,9 +1,8 @@
 import { useReducer, useState } from "react";
 
-function reducer( state, action){
-  console.log( state, action)
+const initialState = { count: 0, step: 1 };
 
-  // return { count: 0, step: 1}
+function reducer( state, action){
 
   switch( action.type ){
     case 'dec':
@@ -22,7 +21,6 @@ function reducer( state, action){
 }
 
 function DateCounter() {
-  const initialState = { count: 0, step: 1}
   const [state, dispatch] = useReducer( reducer, initialState)
 
   const { count, step} = state;
