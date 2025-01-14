@@ -14,6 +14,8 @@ function reducer( state, action){
         return { ...state, count: action.payload };
     case 'setStep':
         return {...state, step: Number(action.payload)}
+    case 'reset':
+       return { count: 0, step: 1}
     default:
       throw new Error("Unknow action")
   }
@@ -45,8 +47,7 @@ function DateCounter() {
   };
 
   const reset = function () {
-    dispatch({ type: 'setCount', payload: 0})
-    dispatch({ type: 'setStep', payload: 1})
+    dispatch({ type: 'reset'})
   };
 
   return (
