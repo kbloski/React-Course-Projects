@@ -134,6 +134,7 @@ progress {
 
 .btn-option:not([disabled]):hover {
   transform: translateX(1.2rem);
+
 }
 
 .btn[disabled]:hover {
@@ -154,6 +155,7 @@ progress {
 .btn-option {
   width: 100%;
   text-align: left;
+  margin-bottom: .5rem;
 }
 
 .btn-option.correct {

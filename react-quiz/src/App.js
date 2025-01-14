@@ -9,7 +9,8 @@ import Question from "./components/Question";
 
 const initialState = {
   status: 'loading',
-  questions: []
+  questions: [],
+  questionIndex: 0
 }
 
 function reducer(state, action){
@@ -37,10 +38,8 @@ function reducer(state, action){
 }
 
 function App() {
-  const [{status, questions}, dispatch] = useReducer( reducer, initialState)
+  const [{status, questions, questionIndex}, dispatch] = useReducer( reducer, initialState)
   const { questions : dataQuestions , isLoading, error } = useQuestions()
-
-
   const numQuestions = questions.length;
 
   useEffect(() => {
@@ -60,7 +59,7 @@ function App() {
               { status === 'loading' && <Loader />}
               { status === 'error' && <Error />}
               { status === 'ready' && <StartScreen numQuestions={numQuestions} onStart={() => dispatch({ type: 'startQuiz'}) }/>}
-              { status === 'active' && <Question />}
+              { status === 'active' && <Question question={questions[questionIndex]} />}
           </Main>
       </div>
   );
